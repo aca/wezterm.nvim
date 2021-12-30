@@ -16,7 +16,7 @@ cd wezterm.nvim.navigator && go install
 
 .bashrc / .zshrc
 ```
-[ -n "WEZTERM_PANE" ] && export NVIM_LISTEN_ADDRESS="/tmp/nvim$WEZTERM_PANE"
+[ -n "$WEZTERM_PANE" ] && export NVIM_LISTEN_ADDRESS="/tmp/nvim$WEZTERM_PANE"
 ```
 
 .config/fish/config.fish
