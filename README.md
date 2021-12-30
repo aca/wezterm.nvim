@@ -1,18 +1,12 @@
 # wezterm.nvim
 
-This replaces [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) for [wezterm](https://github.com/wez/wezterm).
-Currently wezterm doesn't provide api to execute wezterm action inside neovim. So we execute commandline in wezterm which 
-uses neovim remote msgpack api. 
+Replacement of
+- [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) 
+- [better-vim-tmux-resizer](https://github.com/RyanMillerC/better-vim-tmux-resizer)
 
-Checkout https://github.com/wez/wezterm/discussions/995 for details/updates.
+for [wezterm](https://github.com/wez/wezterm).
 
----
-
-install
-```
-cd wezterm.nvim.navigator && go install
-```
-
+## prerequisite
 
 .bashrc / .zshrc
 ```
@@ -25,6 +19,22 @@ if not set -q $WEZTERM_PANE
   set -x NVIM_LISTEN_ADDRESS "/tmp/nvim$WEZTERM_PANE"
 end
 ```
+
+
+## navigator
+
+Currently wezterm doesn't provide api to execute wezterm action inside neovim. So we execute commandline program in wezterm which 
+uses neovim remote msgpack api. 
+
+Checkout https://github.com/wez/wezterm/discussions/995 for details/updates.
+
+---
+
+install
+```
+cd wezterm.nvim.navigator && go install
+```
+
 
 wezterm config
 ```
@@ -66,3 +76,39 @@ wezterm mapping
 { key = "k", mods = "CTRL", action = wezterm.action({ EmitEvent = "move-up" }) },
 { key = "j", mods = "CTRL", action = wezterm.action({ EmitEvent = "move-down" }) },
 ```
+
+## resizer
+
+```
+local vim_resize = function(window, pane, direction_wez, direction_nvim)
+	if file_exists("/tmp/nvim" .. pane:pane_id()) then
+		window:perform_action(wezterm.action({ SendString = "\x1b" .. direction_nvim }), pane)
+	else
+		window:perform_action(wezterm.action({ AdjustPaneSize = { direction_wez, 5 } }), pane)
+	end
+end
+
+wezterm.on("resize-left", function(window, pane)
+	vim_resize(window, pane, "Left", "h")
+end)
+
+wezterm.on("resize-right", function(window, pane)
+	vim_resize(window, pane, "Right", "l")
+end)
+
+wezterm.on("resize-up", function(window, pane)
+	vim_resize(window, pane, "Up", "k")
+end)
+
+wezterm.on("resize-down", function(window, pane)
+	vim_resize(window, pane, "Down", "j")
+end)
+```
+
+```
+{ key = "h", mods = "ALT", action = wezterm.action({ EmitEvent = "resize-left" }) },
+{ key = "l", mods = "ALT", action = wezterm.action({ EmitEvent = "resize-right" }) },
+{ key = "k", mods = "ALT", action = wezterm.action({ EmitEvent = "resize-up" }) },
+{ key = "j", mods = "ALT", action = wezterm.action({ EmitEvent = "resize-down" }) },
+```
+
