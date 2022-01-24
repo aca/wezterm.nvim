@@ -110,10 +110,19 @@ wezterm mapping
 
 ```
 local vim_resize = function(window, pane, direction_wez, direction_nvim)
-	if file_exists("/tmp/nvim" .. pane:pane_id()) then
+	local result = os.execute(
+		"env NVIM_LISTEN_ADDRESS=/tmp/nvim"
+			.. pane:pane_id()
+			.. " "
+			.. homedir
+			.. "/bin/"
+			.. "wezterm.nvim.navigator "
+			.. direction_nvim
+	)
+	if result then
 		window:perform_action(wezterm.action({ SendString = "\x1b" .. direction_nvim }), pane)
 	else
-		window:perform_action(wezterm.action({ AdjustPaneSize = { direction_wez, 5 } }), pane)
+		window:perform_action(wezterm.action({ ActivatePaneDirection = direction_wez }), pane)
 	end
 end
 
