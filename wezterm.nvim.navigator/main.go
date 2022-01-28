@@ -2,11 +2,17 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/neovim/go-client/nvim"
 )
 
 func main() {
+	go func() {
+		time.Sleep(time.Second / 2)
+		os.Exit(1)
+	}()
+
 	direction := os.Args[1]
 	addr := os.Getenv("NVIM_LISTEN_ADDRESS")
 	c, err := nvim.Dial(addr)
